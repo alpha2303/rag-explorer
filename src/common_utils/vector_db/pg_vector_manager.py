@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 from pgvector.psycopg import register_vector
 import psycopg
 from sentence_transformers import SentenceTransformer
@@ -17,14 +17,18 @@ class PGVectorManager(BaseVDBManager):
 
         self._init_db()
 
-        self._sentence_transformer: SentenceTransformer = SentenceTransformer(self._model_name)
+        self._sentence_transformer: SentenceTransformer = SentenceTransformer(
+            self._model_name
+        )
         self._texts: List[str] = []
         self._embeddings: np.ndarray | None = None
 
     def _init_db(self):
         self._conn = psycopg.connect(self._connection_string, autocommit=True)
         self._conn.execute("CREATE EXTENSION IF NOT EXISTS vector")
-        self._conn.execute("CREATE TABLE IF NOT EXISTS documents (id SERIAL PRIMARY KEY, text TEXT, embedding VECTOR(384))")
+        self._conn.execute(
+            "CREATE TABLE IF NOT EXISTS documents (id SERIAL PRIMARY KEY, text TEXT, embedding VECTOR(384))"
+        )
         register_vector(self._conn)
 
     def insert_documents(self, texts: List[str], embeddings: np.ndarray) -> None:
@@ -33,5 +37,5 @@ class PGVectorManager(BaseVDBManager):
 
         self._conn.execute(
             "INSERT INTO documents (text, embedding) VALUES (%s, %s)",
-            (texts, embeddings)
+            (texts, embeddings),
         )

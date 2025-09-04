@@ -1,11 +1,13 @@
 from enum import Enum
-from typing import Optional, List
-from io import FileIO, TextIOWrapper
+from typing import List
+from io import TextIOWrapper
+
 
 class ChunkMode(Enum):
     SIZE = "size"
     SENTENCE = "sentence"
     PARA = "para"
+
 
 class TextChunker:
     def __init__(self, chunk_mode: ChunkMode = ChunkMode.PARA, chunk_size: int = 1024):
@@ -30,8 +32,8 @@ class TextChunker:
                     buffer += str(chunk)
                     period_index = buffer.find(". ")
                     if period_index != -1:
-                        text_chunks.append(buffer[:period_index + 1])
-                        buffer = buffer[period_index + 2:]
+                        text_chunks.append(buffer[: period_index + 1])
+                        buffer = buffer[period_index + 2 :]
                 if buffer:
                     text_chunks.append(buffer)
             case ChunkMode.PARA:
@@ -44,7 +46,7 @@ class TextChunker:
                     period_index = buffer.find("\n\n")
                     if period_index != -1:
                         text_chunks.append(buffer[:period_index])
-                        buffer = buffer[period_index + 2:]
+                        buffer = buffer[period_index + 2 :]
                 if buffer:
                     text_chunks.append(buffer)
 
